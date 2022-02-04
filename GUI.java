@@ -8,33 +8,33 @@ import java.awt.event.ActionListener;
 public class GUI implements ActionListener{
     private JFrame frame;
     private JPanel panel;
-    private JButton button;
-    private JLabel buttonLabel;
-    private JLabel salaryAmtLabel;
-    private JTextField textField;
+    private JButton calculateButton;
+    private JLabel calculateButtonLabel;
+    private JLabel salaryLabel;
+    private JTextField salaryField;
     private JTextField pensionField;
     private JLabel pensionLabel;
 
     public GUI() {
         frame = new JFrame();
         panel = new JPanel();
-        button = new JButton("Calculate Salary");
-        buttonLabel = new JLabel("Salary after tax: ");
-        salaryAmtLabel = new JLabel("Enter pre tax Salary");
-        textField = new JTextField(1);
+        calculateButton = new JButton("Calculate Salary");
+        calculateButtonLabel = new JLabel("Salary after tax: ");
+        salaryLabel = new JLabel("Enter pre tax Salary");
+        salaryField = new JTextField(1);
         pensionLabel = new JLabel("Enter your employee pension contribution (%)");
         pensionField = new JTextField(1);
 
-        button.addActionListener(this);
+        calculateButton.addActionListener(this);
 
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 30));
         panel.setLayout(new GridLayout(0, 1));
-        panel.add(salaryAmtLabel);
-        panel.add(textField);
+        panel.add(salaryLabel);
+        panel.add(salaryField);
         panel.add(pensionLabel);
         panel.add(pensionField);
-        panel.add(button);
-        panel.add(buttonLabel);
+        panel.add(calculateButton);
+        panel.add(calculateButtonLabel);
 
 
         frame.add(panel, BorderLayout.CENTER);
@@ -50,25 +50,28 @@ public class GUI implements ActionListener{
 
     // handler for the calculate salary button
     public void actionPerformed(ActionEvent e) {
-        String preTaxSalaryAmt = textField.getText();
+        String preTaxSalaryAmt = salaryField.getText();
         String pensionAmt = pensionField.getText();
         double postTaxSalaryAmt;
-        String errTxt = "Please enter a salary value";
+        String SalaryErr = "Please enter a salary value";
+        String PensionErr = "Please enter a pension value";
 
         // handle null values in the input fields
-        if (!preTaxSalaryAmt.equals("")) {
+        if (preTaxSalaryAmt.equals("")){
+            calculateButtonLabel.setText(SalaryErr); // tell the user to enter a value
+        } else if (pensionAmt.equals("")){
+            calculateButtonLabel.setText(PensionErr); // tell the user to enter a value
+        } else {
             postTaxSalaryAmt = calcSalary(Double.parseDouble(String.valueOf(preTaxSalaryAmt)),
                                           Double.parseDouble(String.valueOf(pensionAmt))
                                          );
 
-
-            buttonLabel.setText("Salary after tax, AHV/IV, pension: "); // clear the field first before recalc
-            buttonLabel.setText(buttonLabel.getText() + postTaxSalaryAmt);
-        }else {
-            buttonLabel.setText(errTxt); // tell the user to enter a value
+            calculateButtonLabel.setText("Salary after tax, AHV/IV, pension: "); // clear the field first before recalc
+            calculateButtonLabel.setText(calculateButtonLabel.getText() + postTaxSalaryAmt);
         }
     }
 
+    // method to calculate the salary, input of pre-tax salary and pension values
     public double calcSalary(double preTaxSalary, double pensionValue){
         double ahvValue = 5.3;
         double alvValue = 1.1;
