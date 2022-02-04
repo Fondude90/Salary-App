@@ -5,14 +5,18 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import javax.swing.JScrollPane;
 
-public class GUI implements ActionListener{
+import static java.awt.Component.RIGHT_ALIGNMENT;
+
+public class GUI implements ActionListener {
     private JLabel calculateButtonLabel;
     private JTextField salaryField;
     private JTextField pensionField;
+    private DefaultListModel listModel;
     JFrame frame = new JFrame();
     JPanel panel = new JPanel();
-    JLabel ahvLabel = new JLabel("AHV Value at 5.3%: CHF" );
+    JLabel ahvLabel = new JLabel("AHV Value at 5.3%: CHF");
     JLabel alvLabel = new JLabel("IV Value at 1.1%: CHF");
     JLabel taxLabel = new JLabel("Income Tax Value at 11.25%: CHF");
     double ahvRate = 5.3;
@@ -27,27 +31,68 @@ public class GUI implements ActionListener{
     public GUI() {
 
         JButton calculateButton = new JButton("Calculate Salary");
-        JLabel pensionLabel = new JLabel("Enter your employee pension contribution (%)");
-        JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF)");
+        JLabel pensionLabel = new JLabel("Enter your employee pension contribution (%):");
+        JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF):");
+        JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
+
+        // Set up the Canton List
+        String[] cantons = {"Aargau (Argovia)"
+                , "Appenzell Ausserrhoden (Outer Rhodes)"
+                , "Appenzell Innerrhoden (Inner Rhodes)"
+                , "Basel-Landschaft (Basle-Country)"
+                , "Basel-Stadt (Basle-City)"
+                , "Berne (Bern)"
+                , "Fribourg"
+                , "Geneva"
+                , "Glarus"
+                , "Graubünden (Grisons)"
+                , "Jura"
+                , "Lucerne"
+                , "Neuchâtel"
+                , "Nidwalden (Nidwald)"
+                , "Obwalden (Obwald)"
+                , "Schaffhausen"
+                , "Schwyz"
+                , "Solothurn"
+                , "St. Gallen (St.Gall)"
+                , "Thurgau (Thurgovia)"
+                , "Ticino"
+                , "Uri"
+                , "Valais"
+                , "Vaud"
+                , "Zug"
+                , "Zürich (Zurich)"};
+
+        JList cantonList = new JList(cantons);
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setViewportView(cantonList);
+        cantonList.setLayoutOrientation(JList.VERTICAL);
+        cantonList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cantonList.setVisibleRowCount(-1);
 
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
         calculateButtonLabel = new JLabel("Salary after tax: ");
+
         calculateButton.addActionListener(this);
 
+        // Add all the elements into the GUI panel
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
         panel.setLayout(new GridLayout(0, 1));
         panel.add(salaryLabel);
         panel.add(salaryField);
         panel.add(pensionLabel);
         panel.add(pensionField);
+        panel.add(cantonLabel);
+        //panel.add(cantonList);
+        panel.add(scrollPane);
         panel.add(calculateButton);
-        panel.add(calculateButtonLabel);
 
+        // Add panel to the frame and enable settings
         frame.add(panel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Salary Calculator");
-        frame.setPreferredSize(new Dimension(400, 300));
+        frame.setPreferredSize(new Dimension(800, 600));
         frame.pack();
         frame.setVisible(true);
     }
@@ -62,22 +107,22 @@ public class GUI implements ActionListener{
         String pensionAmt = pensionField.getText();
         String SalaryErr = "Please enter a salary value";
         String PensionErr = "Please enter a pension value";
-        String salaryTxt = "Salary after tax, AHV/IV, pension: CHF";
+        String salaryTxt = "Take home salary: CHF";
         String ahvText = "AHV Value at 5.3%: CHF";
         String alvText = "ALV Value at 1.1%: CHF";
         String taxText = "Income Tax at 11.25%: CHF";
         double postTaxSalaryAmt;
 
         // handle null values in the input fields
-        if (preTaxSalaryAmt.equals("")){
+        if (preTaxSalaryAmt.equals("")) {
             calculateButtonLabel.setText(SalaryErr);
-        } else if (pensionAmt.equals("")){
+        } else if (pensionAmt.equals("")) {
             calculateButtonLabel.setText(PensionErr);
         } else {
             // calculate the post tax salary
             postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
-                                         ,Double.parseDouble(pensionAmt)
-                                         );
+                    , Double.parseDouble(pensionAmt)
+            );
 
             // clear the fields first before recalc
             calculateButtonLabel.setText(salaryTxt);
@@ -95,19 +140,20 @@ public class GUI implements ActionListener{
             panel.add(ahvLabel);
             panel.add(alvLabel);
             panel.add(taxLabel);
+            panel.add(calculateButtonLabel);
         }
     }
 
     // method to calculate the salary, input of pre-tax salary and pension values
-    public double calcSalary(double preTaxSalary, double pensionValue){
+    public double calcSalary(double preTaxSalary, double pensionValue) {
         double pensionVal;
         double postTaxSal;
 
         // convert the input values to percentages
-        ahvValue = (ahvRate/100)*preTaxSalary;
-        alvValue = (alvRate/100)*preTaxSalary;
-        taxValue = (taxRate/100)*preTaxSalary;
-        pensionVal = (pensionValue/100)*preTaxSalary;
+        ahvValue = (ahvRate / 100) * preTaxSalary;
+        alvValue = (alvRate / 100) * preTaxSalary;
+        taxValue = (taxRate / 100) * preTaxSalary;
+        pensionVal = (pensionValue / 100) * preTaxSalary;
 
         // Calculate the post tax salary
         postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - pensionVal;
@@ -117,7 +163,7 @@ public class GUI implements ActionListener{
         System.out.println("income tax: " + taxValue);
         System.out.println("ahv: " + ahvValue);
         System.out.println("alv: " + alvValue);
-        System.out.println("pensionVal: " + pensionVal);    
+        System.out.println("pensionVal: " + pensionVal);
         System.out.println("post tax: " + postTaxSal);
 
         return Double.parseDouble(df.format(postTaxSal));
