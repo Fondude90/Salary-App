@@ -19,14 +19,17 @@ public class GUI implements ActionListener {
     JLabel ahvLabel = new JLabel("AHV Value at 5.3%: CHF");
     JLabel alvLabel = new JLabel("IV Value at 1.1%: CHF");
     JLabel taxLabel = new JLabel("Income Tax Value at 11.25%: CHF");
+    JRadioButton churchTax = new JRadioButton( "Church Tax?");
     double ahvRate = 5.3;
     double alvRate = 1.1;
     double taxRate = 11.25;
+    double churchTaxRate = 15;
     double ahvValue;
     double alvValue;
     double taxValue;
 
     DecimalFormat df = new DecimalFormat("#.##");
+
 
     public GUI() {
 
@@ -35,7 +38,8 @@ public class GUI implements ActionListener {
         JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF):");
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
-        // Set up the Canton List
+
+        // Set up the Canton Array
         String[] cantons = {"Aargau (Argovia)"
                 , "Appenzell Ausserrhoden (Outer Rhodes)"
                 , "Appenzell Innerrhoden (Inner Rhodes)"
@@ -63,6 +67,7 @@ public class GUI implements ActionListener {
                 , "Zug"
                 , "Zürich (Zurich)"};
 
+        // set up the list field and scroll bar
         JList cantonList = new JList(cantons);
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(cantonList);
@@ -74,6 +79,7 @@ public class GUI implements ActionListener {
         pensionField = new JTextField(1);
         calculateButtonLabel = new JLabel("Salary after tax: ");
 
+        // called when clicking calculate salary button
         calculateButton.addActionListener(this);
 
         // Add all the elements into the GUI panel
@@ -83,16 +89,17 @@ public class GUI implements ActionListener {
         panel.add(salaryField);
         panel.add(pensionLabel);
         panel.add(pensionField);
-        panel.add(cantonLabel);
+        //panel.add(cantonLabel);
         //panel.add(cantonList);
-        panel.add(scrollPane);
+        //panel.add(scrollPane);
+        panel.add(churchTax);
         panel.add(calculateButton);
 
         // Add panel to the frame and enable settings
         frame.add(panel, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Salary Calculator");
-        frame.setPreferredSize(new Dimension(800, 600));
+        frame.setPreferredSize(new Dimension(1000, 11000));
         frame.pack();
         frame.setVisible(true);
     }
@@ -111,18 +118,37 @@ public class GUI implements ActionListener {
         String ahvText = "AHV Value at 5.3%: CHF";
         String alvText = "ALV Value at 1.1%: CHF";
         String taxText = "Income Tax at 11.25%: CHF";
+        JLabel churchTaxLabel = new JLabel("Church Tax at 15%: CHF");
         double postTaxSalaryAmt;
+        boolean printValues;
+
+        System.out.println("calculate button clicked");
 
         // handle null values in the input fields
         if (preTaxSalaryAmt.equals("")) {
             calculateButtonLabel.setText(SalaryErr);
+            printValues = false;
         } else if (pensionAmt.equals("")) {
             calculateButtonLabel.setText(PensionErr);
-        } else {
-            // calculate the post tax salary
-            postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
-                    , Double.parseDouble(pensionAmt)
-            );
+            printValues = false;
+        } else{
+            printValues = true;
+        }
+
+        if (printValues != false) {
+            if (!churchTax.isSelected()) {
+                // calculate the post tax salary
+                postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
+                        , Double.parseDouble(pensionAmt)
+                        , Double.parseDouble("0")
+                );
+            } else {
+                // calculate the post tax salary with churchh tax
+                postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
+                        , Double.parseDouble(pensionAmt)
+                        , churchTaxRate
+                );
+            }
 
             // clear the fields first before recalc
             calculateButtonLabel.setText(salaryTxt);
@@ -141,22 +167,36 @@ public class GUI implements ActionListener {
             panel.add(alvLabel);
             panel.add(taxLabel);
             panel.add(calculateButtonLabel);
+
+            if(churchTax.isEnabled()){
+                panel.add(churchTaxLabel);
+            }
+
+        } else {
+            // return error label due to missing values
+            panel.add(calculateButtonLabel);
         }
     }
 
+
+
+
+
     // method to calculate the salary, input of pre-tax salary and pension values
-    public double calcSalary(double preTaxSalary, double pensionValue) {
+    public double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
         double pensionVal;
         double postTaxSal;
+        double churchTaxVal;
 
         // convert the input values to percentages
         ahvValue = (ahvRate / 100) * preTaxSalary;
         alvValue = (alvRate / 100) * preTaxSalary;
         taxValue = (taxRate / 100) * preTaxSalary;
+        churchTaxVal = (churchTax/100)* preTaxSalary;
         pensionVal = (pensionValue / 100) * preTaxSalary;
 
         // Calculate the post tax salary
-        postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - pensionVal;
+        postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - churchTaxVal - pensionVal;
 
         // debug values
         System.out.println("pre tax: " + preTaxSalary);
@@ -164,8 +204,15 @@ public class GUI implements ActionListener {
         System.out.println("ahv: " + ahvValue);
         System.out.println("alv: " + alvValue);
         System.out.println("pensionVal: " + pensionVal);
+        System.out.println("churchTax: " + churchTaxVal);
         System.out.println("post tax: " + postTaxSal);
 
         return Double.parseDouble(df.format(postTaxSal));
     }
+    /* method to return the tax rate of a specific canton
+    public double retTaxRate(String cantonName){
+
+    }
+
+     */
 }
