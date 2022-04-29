@@ -4,104 +4,67 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import javax.swing.JScrollPane;
 
 import static java.awt.Component.RIGHT_ALIGNMENT;
 
 public class GUI implements ActionListener {
     private JLabel calculateButtonLabel;
+    private JLabel postTaxField;
+    private JLabel mthlTaxField;
     private JTextField salaryField;
     private JTextField pensionField;
     private DefaultListModel listModel;
-    JFrame frame = new JFrame();
-    JPanel panel = new JPanel();
-    JLabel ahvLabel = new JLabel("AHV Value at 5.3%: CHF");
-    JLabel alvLabel = new JLabel("IV Value at 1.1%: CHF");
-    JLabel taxLabel = new JLabel("Income Tax Value at 11.25%: CHF");
-    JRadioButton churchTax = new JRadioButton( "Church Tax?");
-    double ahvRate = 5.3;
-    double alvRate = 1.1;
+    DecimalFormat df = new DecimalFormat("#.##");
+    double ahvRate = 10.6;
+    double alvRate = 2.2;
     double taxRate = 11.25;
-    double churchTaxRate = 15;
+    double churchTaxRate = 0.8;
     double ahvValue;
     double alvValue;
     double taxValue;
+    double churchTaxValue;
+    double pensionVal;
+    double postTaxSalaryAmt;
+    double mthNetSalaryAmt;
+    String salaryTxt = "Take home salary: CHF";
+    String mthSalaryTxt = "Monthly CHF:";
+    String ahvText = "AHV/IV/EO (OASI) Value at 10.6%: CHF";
+    String alvText = "ALV Value at 2.2%: CHF";
+    String taxText = "Income Tax at 11.25%: CHF";
+    String churchTaxText = "Church Tax at " + churchTaxRate + "%: CHF";
+    String headerText = "Salary Information:";
 
-    DecimalFormat df = new DecimalFormat("#.##");
-
+    JFrame frame = new JFrame();
+    JPanel panel = new JPanel();
+    JLabel ahvLabel = new JLabel(ahvText);
+    JLabel alvLabel = new JLabel(alvText);
+    JLabel taxLabel = new JLabel(taxText);
+    JLabel churchTaxLabel = new JLabel(churchTaxText);
+    JLabel pensionLabel = new JLabel();
+    JRadioButton churchTax = new JRadioButton("Church Tax?");
 
     public GUI() {
 
         JButton calculateButton = new JButton("Calculate Salary");
-        JLabel pensionLabel = new JLabel("Enter your employee pension contribution (%):");
+        JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
         JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF):");
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
-
-        // Set up the Canton Array
-        String[] cantons = {"Aargau (Argovia)"
-                , "Appenzell Ausserrhoden (Outer Rhodes)"
-                , "Appenzell Innerrhoden (Inner Rhodes)"
-                , "Basel-Landschaft (Basle-Country)"
-                , "Basel-Stadt (Basle-City)"
-                , "Berne (Bern)"
-                , "Fribourg"
-                , "Geneva"
-                , "Glarus"
-                , "Graubünden (Grisons)"
-                , "Jura"
-                , "Lucerne"
-                , "Neuchâtel"
-                , "Nidwalden (Nidwald)"
-                , "Obwalden (Obwald)"
-                , "Schaffhausen"
-                , "Schwyz"
-                , "Solothurn"
-                , "St. Gallen (St.Gall)"
-                , "Thurgau (Thurgovia)"
-                , "Ticino"
-                , "Uri"
-                , "Valais"
-                , "Vaud"
-                , "Zug"
-                , "Zürich (Zurich)"};
-
-        // set up the list field and scroll bar
-        JList cantonList = new JList(cantons);
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewportView(cantonList);
-        cantonList.setLayoutOrientation(JList.VERTICAL);
-        cantonList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        cantonList.setVisibleRowCount(-1);
-
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
+        postTaxField = new JLabel("Salary after tax: ");
+        mthlTaxField = new JLabel("Monthly Salary after tax: ");
         calculateButtonLabel = new JLabel("Salary after tax: ");
 
-        // called when clicking calculate salary button
-        calculateButton.addActionListener(this);
-
         // Add all the elements into the GUI panel
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-        panel.setLayout(new GridLayout(0, 1));
-        panel.add(salaryLabel);
-        panel.add(salaryField);
-        panel.add(pensionLabel);
-        panel.add(pensionField);
-        //panel.add(cantonLabel);
-        //panel.add(cantonList);
-        //panel.add(scrollPane);
-        panel.add(churchTax);
-        panel.add(calculateButton);
+        addInitialPanels();
 
-        // Add panel to the frame and enable settings
-        frame.add(panel, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setTitle("Salary Calculator");
-        frame.setPreferredSize(new Dimension(1000, 11000));
-        frame.pack();
-        frame.setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -110,109 +73,213 @@ public class GUI implements ActionListener {
 
     // handler for calculate salary button
     public void actionPerformed(ActionEvent e) {
-        String preTaxSalaryAmt = salaryField.getText();
-        String pensionAmt = pensionField.getText();
-        String SalaryErr = "Please enter a salary value";
-        String PensionErr = "Please enter a pension value";
-        String salaryTxt = "Take home salary: CHF";
-        String ahvText = "AHV Value at 5.3%: CHF";
-        String alvText = "ALV Value at 1.1%: CHF";
-        String taxText = "Income Tax at 11.25%: CHF";
-        JLabel churchTaxLabel = new JLabel("Church Tax at 15%: CHF");
-        double postTaxSalaryAmt;
-        boolean printValues;
+        System.out.println("Click");
+        boolean printValues = nullChecker(salaryField.getText(), pensionField.getText());
 
-        System.out.println("calculate button clicked");
-
-        // handle null values in the input fields
-        if (preTaxSalaryAmt.equals("")) {
-            calculateButtonLabel.setText(SalaryErr);
-            printValues = false;
-        } else if (pensionAmt.equals("")) {
-            calculateButtonLabel.setText(PensionErr);
-            printValues = false;
-        } else{
-            printValues = true;
-        }
-
-        if (printValues != false) {
-            if (!churchTax.isSelected()) {
-                // calculate the post tax salary
-                postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
-                        , Double.parseDouble(pensionAmt)
-                        , Double.parseDouble("0")
-                );
-            } else {
-                // calculate the post tax salary with churchh tax
-                postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
-                        , Double.parseDouble(pensionAmt)
-                        , churchTaxRate
-                );
-            }
-
-            // clear the fields first before recalc
-            calculateButtonLabel.setText(salaryTxt);
-            ahvLabel.setText(ahvText);
-            alvLabel.setText(alvText);
-            taxLabel.setText(taxText);
-
-            // update the labels with the new values
-            calculateButtonLabel.setText(calculateButtonLabel.getText() + postTaxSalaryAmt);
-            ahvLabel.setText(ahvLabel.getText() + df.format(ahvValue));
-            alvLabel.setText(alvLabel.getText() + df.format(alvValue));
-            taxLabel.setText(taxLabel.getText() + df.format(taxValue));
-
-            // add the labels for the deductions after calculating
-            panel.add(ahvLabel);
-            panel.add(alvLabel);
-            panel.add(taxLabel);
-            panel.add(calculateButtonLabel);
-
-            if(churchTax.isEnabled()){
-                panel.add(churchTaxLabel);
-            }
-
-        } else {
-            // return error label due to missing values
-            panel.add(calculateButtonLabel);
+        // Null check OK, proceed
+        if (printValues){
+            processCalc(pensionField.getText());
         }
     }
 
 
-
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //METHODS USED BELOW
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // method to calculate the salary, input of pre-tax salary and pension values
     public double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
-        double pensionVal;
+        System.out.println("calcSalary called");
+
         double postTaxSal;
-        double churchTaxVal;
 
         // convert the input values to percentages
         ahvValue = (ahvRate / 100) * preTaxSalary;
         alvValue = (alvRate / 100) * preTaxSalary;
         taxValue = (taxRate / 100) * preTaxSalary;
-        churchTaxVal = (churchTax/100)* preTaxSalary;
+        churchTaxValue = (churchTax / 100) * preTaxSalary;
         pensionVal = (pensionValue / 100) * preTaxSalary;
 
         // Calculate the post tax salary
-        postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - churchTaxVal - pensionVal;
-
-        // debug values
-        System.out.println("pre tax: " + preTaxSalary);
-        System.out.println("income tax: " + taxValue);
-        System.out.println("ahv: " + ahvValue);
-        System.out.println("alv: " + alvValue);
-        System.out.println("pensionVal: " + pensionVal);
-        System.out.println("churchTax: " + churchTaxVal);
-        System.out.println("post tax: " + postTaxSal);
+        postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - churchTaxValue - pensionVal;
 
         return Double.parseDouble(df.format(postTaxSal));
     }
-    /* method to return the tax rate of a specific canton
-    public double retTaxRate(String cantonName){
+
+    // Method to add the panels for the deductions
+    public void addDeductionPanels() {
+        System.out.println("addDeductionPanels called");
+        panel.add(calculateButtonLabel);
+        panel.add(ahvLabel);
+        panel.add(alvLabel);
+        panel.add(taxLabel);
+        panel.add(pensionLabel);
+        // Add church tax panels if required
+        chkChurchTax(churchTax.isSelected());
 
     }
 
-     */
+    public void addInitialPanels() {
+        System.out.println("addInitialPanels called");
+
+        JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF):");
+        JButton calculateButton = new JButton("Calculate Salary");
+        JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
+        JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
+
+        salaryField = new JTextField(1);
+        pensionField = new JTextField(1);
+
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        panel.setLayout(new GridLayout(0, 1));
+        panel.add(salaryLabel);
+        panel.add(salaryField);
+        panel.add(enterPensionLabel);
+        panel.add(pensionField);
+        panel.add(churchTax);
+        panel.add(calculateButton);
+
+        frame.add(panel, BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("Salary Calculator");
+        //frame.setPreferredSize(new Dimension(1000, 11000));
+        frame.pack();
+        frame.setVisible(true);
+        // called when clicking calculate salary button
+        calculateButton.addActionListener(this);
+    }
+
+    // Method to add the panels for the deductions
+    public void updateValues(double postTaxSalaryAmt, double mthNetSalaryAmt) {
+        System.out.println("updateValues called");
+
+        // update the labels with the new values
+        churchTaxLabel.setText(churchTaxLabel.getText() + NumberFormat.getInstance().format(churchTaxValue));
+        postTaxField.setText(postTaxField.getText() + NumberFormat.getInstance().format(postTaxSalaryAmt));
+        mthlTaxField.setText(mthlTaxField.getText() + NumberFormat.getInstance().format(mthNetSalaryAmt));
+        pensionLabel.setText(pensionLabel.getText() + NumberFormat.getInstance().format(pensionVal));
+        ahvLabel.setText(ahvLabel.getText() + NumberFormat.getInstance().format(ahvValue));
+        alvLabel.setText(alvLabel.getText() + NumberFormat.getInstance().format(alvValue));
+        taxLabel.setText(taxLabel.getText() + NumberFormat.getInstance().format(taxValue));
+    }
+
+    // Method to clear the values after a recalc
+    public void clearValues() {
+        System.out.println("clear values called");
+
+        postTaxField.setText(salaryTxt);
+        mthlTaxField.setText(mthSalaryTxt);
+        ahvLabel.setText(ahvText);
+        alvLabel.setText(alvText);
+        taxLabel.setText(taxText);
+        churchTaxLabel.setText(churchTaxText);
+    }
+
+    // Method checks adds/removes churchtax fields
+    public void chkChurchTax(boolean isChurchTaxSelected) {
+        System.out.println("chkChurchTax called");
+
+        if (isChurchTaxSelected) {
+            System.out.println("churchTax.isSelected is true");
+            panel.add(churchTaxLabel);
+            panel.add(postTaxField);
+            panel.add(mthlTaxField);
+        } else {
+            System.out.println("churchTax.isSelected is false");
+            panel.remove(churchTaxLabel);
+            panel.add(postTaxField);
+        }
+    }
+
+    // Method to calculate taxes
+    public double calcTax() {
+        System.out.println("calcTax called");
+
+        double postTaxSalaryAmt;
+        double mthNetSalaryAmt;
+        String preTaxSalaryAmt = salaryField.getText();
+        String pensionAmt = pensionField.getText();
+
+        if (!churchTax.isSelected()) {
+            // calculate the post tax salary without churchtax
+            postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
+                    , Double.parseDouble(pensionAmt)
+                    , Double.parseDouble("0")
+            );
+        } else {
+            // calculate the post tax salary with church tax
+            postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
+                    , Double.parseDouble(pensionAmt)
+                    , churchTaxRate
+            );
+        }
+        return Double.parseDouble(df.format(postTaxSalaryAmt));
+    }
+
+    // Method which processes the calculations
+    public void processCalc(String pensionAmt) {
+        System.out.println("processCalc called");
+        String pensionText = "Pension at " + pensionAmt + "%: CHF";
+        System.out.println("Print values is true");
+        System.out.println("Calculating post tax salary");
+
+        postTaxSalaryAmt = calcTax();
+        mthNetSalaryAmt = postTaxSalaryAmt / 12;
+        pensionLabel.setText(pensionText);
+
+        // update the labels with the new values
+        updateValues(postTaxSalaryAmt, mthNetSalaryAmt);
+
+        // add the labels for the deductions after calculating
+        addDeductionPanels();
+
+        frame.pack();
+    }
+
+    public void clearAfterNull() {
+        System.out.println("clearAfterNull called");
+        panel.remove(ahvLabel);
+        panel.remove(alvLabel);
+        panel.remove(taxLabel);
+        panel.remove(pensionLabel);
+        panel.remove(postTaxField);
+        panel.remove(mthlTaxField);
+        panel.add(calculateButtonLabel);
+    }
+
+    // Method to check required values have been entered
+    public boolean nullChecker(String preTaxSalaryAmt, String pensionAmt) {
+        System.out.println("nullChecker called");
+        boolean printValues;
+        String SalaryErr = "Please enter a salary value";
+        String PensionErr = "Please enter a pension value";
+
+        if (preTaxSalaryAmt.equals("")) {
+            System.out.println("pre tax salary amount is null ");
+
+            calculateButtonLabel.setText(SalaryErr);
+            printValues = false;
+            clearAfterNull();
+        } else {
+            System.out.println("pre tax salary amount is not null");
+            if (pensionAmt.equals("")) {
+                System.out.println("pension amount is null");
+
+                calculateButtonLabel.setText(PensionErr);
+                printValues = false;
+                clearAfterNull();
+            } else {
+                System.out.println("pension amount is not null");
+                System.out.println("printValues set to true");
+
+                pensionAmt = pensionField.getText();
+                calculateButtonLabel.setText(headerText);
+                printValues = true;
+            }
+
+            // clear the fields first before recalc
+            clearValues();
+        }
+        return printValues;
+    }
 }
