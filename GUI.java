@@ -4,14 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.text.ParsePosition;
-import javax.swing.JScrollPane;
-
-import static java.awt.Component.RIGHT_ALIGNMENT;
+import java.util.ArrayList;
 
 public class GUI implements ActionListener {
     private JLabel calculateButtonLabel;
@@ -74,6 +69,7 @@ public class GUI implements ActionListener {
     // handler for calculate salary button
     public void actionPerformed(ActionEvent e) {
         System.out.println("Click");
+
         boolean printValues = nullChecker(salaryField.getText(), pensionField.getText());
 
         // Null check OK, proceed
@@ -119,6 +115,7 @@ public class GUI implements ActionListener {
 
     }
 
+    // Method adds the panels to the GUI
     public void addInitialPanels() {
         System.out.println("addInitialPanels called");
 
@@ -147,9 +144,11 @@ public class GUI implements ActionListener {
         frame.setVisible(true);
         // called when clicking calculate salary button
         calculateButton.addActionListener(this);
+
+        initialiseCantons();
     }
 
-    // Method to add the panels for the deductions
+    // Method to add the panels for the deductions after clicking calculate
     public void updateValues(double postTaxSalaryAmt, double mthNetSalaryAmt) {
         System.out.println("updateValues called");
 
@@ -247,7 +246,7 @@ public class GUI implements ActionListener {
         panel.add(calculateButtonLabel);
     }
 
-    // Method to check required values have been entered
+    // Method to check required values have been entered and can we proceed with printing results
     public boolean nullChecker(String preTaxSalaryAmt, String pensionAmt) {
         System.out.println("nullChecker called");
         boolean printValues;
@@ -276,10 +275,46 @@ public class GUI implements ActionListener {
                 calculateButtonLabel.setText(headerText);
                 printValues = true;
             }
-
-            // clear the fields first before recalc
-            clearValues();
         }
+        // Clear the values of the results for recalculations
+        clearValues();
+
+        // returns whether or not we should proceed with printing results
         return printValues;
+    }
+
+    // Method to create Canton objects
+    public void initialiseCantons() {
+        System.out.println("initialiseCantons called");
+
+        // Set up the Canton Array
+        ArrayList<Canton> cantons = new ArrayList<>();
+
+        Canton aargau = new Canton("Aargau");
+        Canton appenzellAu = new Canton("Appenzell Ausserrhoden");
+        Canton appenzellIn = new Canton("Appenzell Innerrhoden");
+        Canton baselLand = new Canton("Basel-Landschaft");
+        Canton baselStadt = new Canton("Basel-Stadt");
+        Canton bernen = new Canton("Berne");
+        Canton fribourg = new Canton("Fribourg");
+        Canton geneva = new Canton("Geneva");
+        Canton glarus = new Canton("Glarus");
+        Canton graubünden = new Canton("Graubünden");
+        Canton jura = new Canton("Jura");
+        Canton lucerne = new Canton("Lucerne");
+        Canton neuchâtel = new Canton("Neuchâtel");
+        Canton nidwalden = new Canton("Nidwalden");
+        Canton obwalden = new Canton("Obwalden");
+        Canton schaffhausen = new Canton("Schaffhausen");
+        Canton schwyz = new Canton("Schwyz");
+        Canton solothurn = new Canton("Solothurn");
+        Canton stGallen = new Canton("St. Gallen");
+        Canton thurgau = new Canton("Thurgau");
+        Canton ticino = new Canton("Ticino");
+        Canton uri = new Canton("Uri");
+        Canton valais = new Canton("Valais");
+        Canton vaud = new Canton("Vaud");
+        Canton zug = new Canton("Zug");
+        Canton zürich = new Canton("Zürich");
     }
 }
