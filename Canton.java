@@ -1,8 +1,8 @@
 package com.tom.mainGui;
 
 public class Canton {
-    private String name;
-    private double taxRate;
+    public String name;
+    public double taxRate;
 
     public Canton(String initialName){
         name = initialName;
