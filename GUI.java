@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GUI implements ActionListener {
     private JLabel calculateButtonLabel;
@@ -14,7 +15,7 @@ public class GUI implements ActionListener {
     private JLabel mthlTaxField;
     private JTextField salaryField;
     private JTextField pensionField;
-    private DefaultListModel listModel;
+
     DecimalFormat df = new DecimalFormat("#.##");
     double ahvRate = 10.6;
     double alvRate = 2.2;
@@ -58,6 +59,12 @@ public class GUI implements ActionListener {
         calculateButtonLabel = new JLabel("Salary after tax: ");
 
         // Add all the elements into the GUI panel
+        initialiseCantons();
+
+        List<Canton> cantonList = new ArrayList<>();
+
+
+
         addInitialPanels();
 
     }
@@ -73,7 +80,7 @@ public class GUI implements ActionListener {
         boolean printValues = nullChecker(salaryField.getText(), pensionField.getText());
 
         // Null check OK, proceed
-        if (printValues){
+        if (printValues) {
             processCalc(pensionField.getText());
         }
     }
@@ -82,7 +89,37 @@ public class GUI implements ActionListener {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //METHODS USED BELOW
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void initialiseCantons() {
+        // Method to create Canton objects
+        System.out.println("initialiseCantons called");
 
+        Canton aargau = new Canton("Aargau");
+        Canton appenzellAu = new Canton("Appenzell Ausserrhoden");
+        Canton appenzellIn = new Canton("Appenzell Innerrhoden");
+        Canton baselLand = new Canton("Basel-Landschaft");
+        Canton baselStadt = new Canton("Basel-Stadt");
+        Canton bernen = new Canton("Berne");
+        Canton fribourg = new Canton("Fribourg");
+        Canton geneva = new Canton("Geneva");
+        Canton glarus = new Canton("Glarus");
+        Canton graubunden = new Canton("Graubünden");
+        Canton jura = new Canton("Jura");
+        Canton lucerne = new Canton("Lucerne");
+        Canton neuchatel = new Canton("Neuchâtel");
+        Canton nidwalden = new Canton("Nidwalden");
+        Canton obwalden = new Canton("Obwalden");
+        Canton schaffhausen = new Canton("Schaffhausen");
+        Canton schwyz = new Canton("Schwyz");
+        Canton solothurn = new Canton("Solothurn");
+        Canton stGallen = new Canton("St. Gallen");
+        Canton thurgau = new Canton("Thurgau");
+        Canton ticino = new Canton("Ticino");
+        Canton uri = new Canton("Uri");
+        Canton valais = new Canton("Valais");
+        Canton vaud = new Canton("Vaud");
+        Canton zug = new Canton("Zug");
+        Canton zurich = new Canton("Zürich");
+    }
     // method to calculate the salary, input of pre-tax salary and pension values
     public double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
         System.out.println("calcSalary called");
@@ -124,6 +161,10 @@ public class GUI implements ActionListener {
         JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
+        JComboBox cantonField = new JComboBox();
+
+
+
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
 
@@ -133,6 +174,8 @@ public class GUI implements ActionListener {
         panel.add(salaryField);
         panel.add(enterPensionLabel);
         panel.add(pensionField);
+        panel.add(cantonLabel);
+        panel.add(cantonField);
         panel.add(churchTax);
         panel.add(calculateButton);
 
@@ -144,8 +187,6 @@ public class GUI implements ActionListener {
         frame.setVisible(true);
         // called when clicking calculate salary button
         calculateButton.addActionListener(this);
-
-        initialiseCantons();
     }
 
     // Method to add the panels for the deductions after clicking calculate
@@ -243,6 +284,7 @@ public class GUI implements ActionListener {
         panel.remove(pensionLabel);
         panel.remove(postTaxField);
         panel.remove(mthlTaxField);
+        panel.remove(churchTaxLabel);
         panel.add(calculateButtonLabel);
     }
 
@@ -282,39 +324,5 @@ public class GUI implements ActionListener {
         // returns whether or not we should proceed with printing results
         return printValues;
     }
-
-    // Method to create Canton objects
-    public void initialiseCantons() {
-        System.out.println("initialiseCantons called");
-
-        // Set up the Canton Array
-        ArrayList<Canton> cantons = new ArrayList<>();
-
-        Canton aargau = new Canton("Aargau");
-        Canton appenzellAu = new Canton("Appenzell Ausserrhoden");
-        Canton appenzellIn = new Canton("Appenzell Innerrhoden");
-        Canton baselLand = new Canton("Basel-Landschaft");
-        Canton baselStadt = new Canton("Basel-Stadt");
-        Canton bernen = new Canton("Berne");
-        Canton fribourg = new Canton("Fribourg");
-        Canton geneva = new Canton("Geneva");
-        Canton glarus = new Canton("Glarus");
-        Canton graubünden = new Canton("Graubünden");
-        Canton jura = new Canton("Jura");
-        Canton lucerne = new Canton("Lucerne");
-        Canton neuchâtel = new Canton("Neuchâtel");
-        Canton nidwalden = new Canton("Nidwalden");
-        Canton obwalden = new Canton("Obwalden");
-        Canton schaffhausen = new Canton("Schaffhausen");
-        Canton schwyz = new Canton("Schwyz");
-        Canton solothurn = new Canton("Solothurn");
-        Canton stGallen = new Canton("St. Gallen");
-        Canton thurgau = new Canton("Thurgau");
-        Canton ticino = new Canton("Ticino");
-        Canton uri = new Canton("Uri");
-        Canton valais = new Canton("Valais");
-        Canton vaud = new Canton("Vaud");
-        Canton zug = new Canton("Zug");
-        Canton zürich = new Canton("Zürich");
-    }
 }
+        
