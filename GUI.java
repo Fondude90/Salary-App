@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-public class GUI  {
+public class GUI {
     private JLabel calculateButtonLabel;
     private JLabel postTaxField;
     private JLabel mthlTaxField;
@@ -43,7 +43,6 @@ public class GUI  {
     JLabel churchTaxLabel = new JLabel(churchTaxText);
     JLabel pensionLabel = new JLabel();
     JRadioButton churchTax = new JRadioButton("Church Tax?");
-
 
     Canton aargau = new Canton("Aargau");
     Canton appenzellAu = new Canton("Appenzell Ausserrhoden");
@@ -86,7 +85,6 @@ public class GUI  {
         calculateButtonLabel = new JLabel("Salary after tax: ");
 
         addInitialPanels();
-
     }
 
     public static void main(String[] args) {
@@ -97,7 +95,6 @@ public class GUI  {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //METHODS USED BELOW
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     // method to calculate the salary, input of pre-tax salary and pension values
     public double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
@@ -128,7 +125,6 @@ public class GUI  {
         panel.add(pensionLabel);
         // Add church tax panels if required
         chkChurchTax(churchTax.isSelected());
-
     }
 
     // Method adds the panels to the GUI
@@ -139,7 +135,6 @@ public class GUI  {
         JButton calculateButton = new JButton("Calculate Salary");
         JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
-
 
         // Add all the elements into the GUI panel
         JComboBox cantonField = new JComboBox();
@@ -174,8 +169,7 @@ public class GUI  {
         cantonArray.add(zug.getName());
         cantonArray.add(zurich.getName());
 
-        for(int i=0; i<cantonArray.size(); i++)
-        {
+        for (int i = 0; i < cantonArray.size(); i++) {
             cantonField.addItem(cantonArray.get(i));
         }
 
@@ -259,10 +253,12 @@ public class GUI  {
             panel.add(churchTaxLabel);
             panel.add(postTaxField);
             panel.add(mthlTaxField);
+            frame.pack();
         } else {
             System.out.println("churchTax.isSelected is false");
             panel.remove(churchTaxLabel);
             panel.add(postTaxField);
+            frame.pack();
         }
     }
 
@@ -321,6 +317,7 @@ public class GUI  {
         panel.remove(mthlTaxField);
         panel.remove(churchTaxLabel);
         panel.add(calculateButtonLabel);
+        frame.pack();
     }
 
     // Method to check required values have been entered and can we proceed with printing results
