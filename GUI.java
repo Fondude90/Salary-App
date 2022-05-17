@@ -359,6 +359,4 @@ public class GUI {
         // returns whether or not we should proceed with printing results
         return printValues;
     }
-
-}
-        
+}      
