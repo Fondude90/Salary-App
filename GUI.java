@@ -142,8 +142,6 @@ public class GUI {
         ArrayList<String> cantonArray = new ArrayList<String>();
         cantonArray.add(aargau.getName());
         cantonArray.add(appenzellAu.getName());
-        cantonArray.add(aargau.getName());
-        cantonArray.add(appenzellAu.getName());
         cantonArray.add(appenzellIn.getName());
         cantonArray.add(baselLand.getName());
         cantonArray.add(baselStadt.getName());
@@ -213,7 +211,12 @@ public class GUI {
         cantonField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Canton Selected");
+
+                Object[] cantonFieldSelectedItem = cantonField.getSelectedObjects();
+
+
+
+                System.out.println("Canton Selected: "+ cantonField.getSelectedItem() + " || tax rate: " +  (cantonFieldSelectedItem) );
             }
         });
     }
@@ -356,5 +359,6 @@ public class GUI {
         // returns whether or not we should proceed with printing results
         return printValues;
     }
+
 }
         
