@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GUI {
     private JLabel calculateButtonLabel;
@@ -16,24 +15,23 @@ public class GUI {
     private JTextField salaryField;
     private JTextField pensionField;
 
-    static DecimalFormat df = new DecimalFormat("#.##");
-    static double ahvRate = 10.6;
-    static double alvRate = 2.2;
-    static double taxRate = 11.25;
-    static double churchTaxRate = 0.8;
-    static double ahvValue;
-    static double alvValue;
-    static double taxValue;
-    static double churchTaxValue;
-    static double pensionVal;
-    static double postTaxSalaryAmt;
-    static double mthNetSalaryAmt;
-    static double preTaxSalary;
+    DecimalFormat df = new DecimalFormat("#.##");
+    double ahvRate = 10.6;
+    double alvRate = 2.2;
+    double taxRate = 11.25;
+    double churchTaxRate = 0.8;
+    double ahvValue;
+    double alvValue;
+    double taxValue;
+    double churchTaxValue;
+    double pensionVal;
+    double postTaxSalaryAmt;
+    double mthNetSalaryAmt;
     String salaryTxt = "Take home salary: CHF";
     String mthSalaryTxt = "Monthly CHF:";
     String ahvText = "AHV/IV/EO (OASI) Value at 10.6%: CHF";
     String alvText = "ALV Value at 2.2%: CHF";
-    String taxText = "Income Tax at " + taxRate + "%: CHF";
+    String taxText = "Income Tax at 11.25%: CHF";
     String churchTaxText = "Church Tax at " + churchTaxRate + "%: CHF";
     String headerText = "Salary Information:";
 
@@ -46,34 +44,39 @@ public class GUI {
     JLabel pensionLabel = new JLabel();
     JRadioButton churchTax = new JRadioButton("Church Tax?");
 
-    Canton aargau = new Canton("Aargau", 1);
-    Canton appenzellAu = new Canton("Appenzell Ausserrhoden",2);
-    Canton appenzellIn = new Canton("Appenzell Innerrhoden",3);
-    Canton baselLand = new Canton("Basel-Landschaft",4);
-    Canton baselStadt = new Canton("Basel-Stadt",5);
-    Canton bernen = new Canton("Berne",6);
-    Canton fribourg = new Canton("Fribourg",7);
-    Canton geneva = new Canton("Geneva",8);
-    Canton glarus = new Canton("Glarus",9);
-    Canton graubunden = new Canton("Graubünden,",10);
-    Canton jura = new Canton("Jura",11);
-    Canton lucerne = new Canton("Lucerne",12);
-    Canton neuchatel = new Canton("Neuchâtel",13);
-    Canton nidwalden = new Canton("Nidwalden",14);
-    Canton obwalden = new Canton("Obwalden",15);
-    Canton schaffhausen = new Canton("Schaffhausen",16);
-    Canton schwyz = new Canton("Schwyz",17);
-    Canton solothurn = new Canton("Solothurn",18);
-    Canton stGallen = new Canton("St. Gallen",19);
-    Canton thurgau = new Canton("Thurgau",20);
-    Canton ticino = new Canton("Ticino",22);
-    Canton uri = new Canton("Uri",23);
-    Canton valais = new Canton("Valais",24);
-    Canton vaud = new Canton("Vaud",25);
-    Canton zug = new Canton("Zug",26);
-    Canton zurich = new Canton("Zürich",27);
+    Canton aargau = new Canton("Aargau");
+    Canton appenzellAu = new Canton("Appenzell Ausserrhoden");
+    Canton appenzellIn = new Canton("Appenzell Innerrhoden");
+    Canton baselLand = new Canton("Basel-Landschaft");
+    Canton baselStadt = new Canton("Basel-Stadt");
+    Canton bernen = new Canton("Berne");
+    Canton fribourg = new Canton("Fribourg");
+    Canton geneva = new Canton("Geneva");
+    Canton glarus = new Canton("Glarus");
+    Canton graubunden = new Canton("Graubünden");
+    Canton jura = new Canton("Jura");
+    Canton lucerne = new Canton("Lucerne");
+    Canton neuchatel = new Canton("Neuchâtel");
+    Canton nidwalden = new Canton("Nidwalden");
+    Canton obwalden = new Canton("Obwalden");
+    Canton schaffhausen = new Canton("Schaffhausen");
+    Canton schwyz = new Canton("Schwyz");
+    Canton solothurn = new Canton("Solothurn");
+    Canton stGallen = new Canton("St. Gallen");
+    Canton thurgau = new Canton("Thurgau");
+    Canton ticino = new Canton("Ticino");
+    Canton uri = new Canton("Uri");
+    Canton valais = new Canton("Valais");
+    Canton vaud = new Canton("Vaud");
+    Canton zug = new Canton("Zug");
+    Canton zurich = new Canton("Zürich");
 
     public GUI() {
+
+        JButton calculateButton = new JButton("Calculate Salary");
+        JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
+        JLabel salaryLabel = new JLabel("Enter pre tax Salary (CHF):");
+        JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
@@ -92,6 +95,26 @@ public class GUI {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //METHODS USED BELOW
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // method to calculate the salary, input of pre-tax salary and pension values
+    public double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
+        System.out.println("calcSalary called");
+
+        double postTaxSal;
+
+        // convert the input values to percentages
+        ahvValue = (ahvRate / 100) * preTaxSalary;
+        alvValue = (alvRate / 100) * preTaxSalary;
+        taxValue = (taxRate / 100) * preTaxSalary;
+        churchTaxValue = (churchTax / 100) * preTaxSalary;
+        pensionVal = (pensionValue / 100) * preTaxSalary;
+
+        // Calculate the post tax salary
+        postTaxSal = preTaxSalary - ahvValue - alvValue - taxValue - churchTaxValue - pensionVal;
+
+        return Double.parseDouble(df.format(postTaxSal));
+    }
+
     // Method to add the panels for the deductions
     public void addDeductionPanels() {
         System.out.println("addDeductionPanels called");
@@ -114,33 +137,41 @@ public class GUI {
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
         // Add all the elements into the GUI panel
-        JComboBox<Canton> cantonField = new JComboBox<Canton>();
-        cantonField.addItem(aargau);
-        cantonField.addItem(appenzellAu);
-        cantonField.addItem(appenzellIn);
-        cantonField.addItem(baselLand);
-        cantonField.addItem(baselStadt);
-        cantonField.addItem(bernen);
-        cantonField.addItem(fribourg);
-        cantonField.addItem(geneva);
-        cantonField.addItem(glarus);
-        cantonField.addItem(graubunden);
-        cantonField.addItem(jura);
-        cantonField.addItem(lucerne);
-        cantonField.addItem(neuchatel);
-        cantonField.addItem(nidwalden);
-        cantonField.addItem(obwalden);
-        cantonField.addItem(schaffhausen);
-        cantonField.addItem(schwyz);
-        cantonField.addItem(solothurn);
-        cantonField.addItem(stGallen);
-        cantonField.addItem(ticino);
-        cantonField.addItem(thurgau);
-        cantonField.addItem(uri);
-        cantonField.addItem(valais);
-        cantonField.addItem(vaud);
-        cantonField.addItem(zug);
-        cantonField.addItem(zurich);
+        JComboBox cantonField = new JComboBox();
+
+        ArrayList<String> cantonArray = new ArrayList<String>();
+        cantonArray.add(aargau.getName());
+        cantonArray.add(appenzellAu.getName());
+        cantonArray.add(aargau.getName());
+        cantonArray.add(appenzellAu.getName());
+        cantonArray.add(appenzellIn.getName());
+        cantonArray.add(baselLand.getName());
+        cantonArray.add(baselStadt.getName());
+        cantonArray.add(bernen.getName());
+        cantonArray.add(fribourg.getName());
+        cantonArray.add(geneva.getName());
+        cantonArray.add(glarus.getName());
+        cantonArray.add(graubunden.getName());
+        cantonArray.add(jura.getName());
+        cantonArray.add(lucerne.getName());
+        cantonArray.add(neuchatel.getName());
+        cantonArray.add(nidwalden.getName());
+        cantonArray.add(obwalden.getName());
+        cantonArray.add(schaffhausen.getName());
+        cantonArray.add(schwyz.getName());
+        cantonArray.add(solothurn.getName());
+        cantonArray.add(stGallen.getName());
+        cantonArray.add(ticino.getName());
+        cantonArray.add(thurgau.getName());
+        cantonArray.add(uri.getName());
+        cantonArray.add(valais.getName());
+        cantonArray.add(vaud.getName());
+        cantonArray.add(zug.getName());
+        cantonArray.add(zurich.getName());
+
+        for (int i = 0; i < cantonArray.size(); i++) {
+            cantonField.addItem(cantonArray.get(i));
+        }
 
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
@@ -174,7 +205,6 @@ public class GUI {
                 // Null check OK, proceed
                 if (printValues) {
                     processCalc(pensionField.getText());
-                    taxLabel.setText(taxText);
                 }
             }
         });
@@ -183,17 +213,11 @@ public class GUI {
         cantonField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Select");
-                Canton cantonFieldSelectedItem = cantonField.getItemAt(cantonField.getSelectedIndex()); // Crates a variable of type Canton and finds Canton in the Field
-                taxRate = cantonFieldSelectedItem.getTaxRate();                                        // Update the global variable with chosen Canton's tax rate
-                taxText = "Income Tax at " + taxRate + "%: CHF";                                     // Update the label to reflect newly set tax rate
-
-                System.out.println("Canton: " + cantonFieldSelectedItem.getName() + ", tax rate: " + taxRate);
+                System.out.println("Canton Selected");
             }
         });
     }
 
-    // Shouldn't all of these be in a separate page somewhere?
     // Method to add the panels for the deductions after clicking calculate
     public void updateValues(double postTaxSalaryAmt, double mthNetSalaryAmt) {
         System.out.println("updateValues called");
@@ -249,13 +273,13 @@ public class GUI {
 
         if (!churchTax.isSelected()) {
             // calculate the post tax salary without churchtax
-            postTaxSalaryAmt = GUI_Util.calcSalary(Double.parseDouble(preTaxSalaryAmt)
+            postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
                     , Double.parseDouble(pensionAmt)
                     , Double.parseDouble("0")
             );
         } else {
             // calculate the post tax salary with church tax
-            postTaxSalaryAmt = GUI_Util.calcSalary(Double.parseDouble(preTaxSalaryAmt)
+            postTaxSalaryAmt = calcSalary(Double.parseDouble(preTaxSalaryAmt)
                     , Double.parseDouble(pensionAmt)
                     , churchTaxRate
             );
@@ -332,4 +356,5 @@ public class GUI {
         // returns whether or not we should proceed with printing results
         return printValues;
     }
-}       
+}
+        

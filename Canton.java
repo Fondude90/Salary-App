@@ -4,9 +4,9 @@ public class Canton {
     public String name;
     public double taxRate;
 
-    public Canton(String initialName, double initialTaxRate){
+    public Canton(String initialName){
         name = initialName;
-        taxRate = initialTaxRate;
+        taxRate = 0;
     }
 
     public double getTaxRate() {
@@ -29,7 +29,6 @@ public class Canton {
     }
 
     public void printObject(){
-
         System.out.println("Canton: " + name + ", tax rate: " + taxRate);
     }
 }
