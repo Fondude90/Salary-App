@@ -3,11 +3,7 @@
 Creating Java Salary Calculator app to learn Java Swing and Git
 
 
-
-Planned updates: 
-
-
-Add a drop down list of the different Cantons, use this as input for the tax rate 
-
-
+TODO: 
+Fix the JCombobox.  Returns objectID , must display name.
+Fix the results that are printed. Income tax value is null on screen . 
 
