@@ -32,3 +32,4 @@ public class Canton {
         System.out.println("Canton: " + name + ", tax rate: " + taxRate);
     }
 }
+
