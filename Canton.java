@@ -1,8 +1,59 @@
 package com.tom.mainGui;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+
 public class Canton {
     public String name;
     public double taxRate;
+    public static ArrayList<Canton> cantonList = new ArrayList<>();
+    public static JComboBox cantonField;
+
+    public static void createCantonList() {
+        cantonList.add(Canton.aargau);
+        cantonList.add(Canton.appenzellAu);
+        cantonList.add(Canton.appenzellIn);
+        cantonList.add(Canton.baselLand);
+        cantonList.add(Canton.baselStadt);
+        cantonList.add(Canton.bernen);
+        cantonList.add(Canton.fribourg);
+        cantonList.add(Canton.geneva);
+        cantonList.add(Canton.glarus);
+        cantonList.add(Canton.graubunden);
+        cantonList.add(Canton.jura);
+        cantonList.add(Canton.lucerne);
+        cantonList.add(Canton.neuchatel);
+        cantonList.add(Canton.nidwalden);
+        cantonList.add(Canton.obwalden);
+        cantonList.add(Canton.schaffhausen);
+        cantonList.add(Canton.schwyz);
+        cantonList.add(Canton.solothurn);
+        cantonList.add(Canton.stGallen);
+        cantonList.add(Canton.ticino);
+        cantonList.add(Canton.thurgau);
+        cantonList.add(Canton.uri);
+        cantonList.add(Canton.valais);
+        cantonList.add(Canton.vaud);
+        cantonList.add(Canton.zug);
+        cantonList.add(Canton.zurich);
+
+
+        cantonField = new JComboBox(new DefaultComboBoxModel());
+
+        cantonField.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value instanceof Canton){
+                    Canton canton = (Canton) value;
+                    setText(canton.getName());
+                }
+                return this;
+            }
+        } );
+    }
+
 
     public Canton(String initialName, double initialTaxRate){
         name = initialName;
