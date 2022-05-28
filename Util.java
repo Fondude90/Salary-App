@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import static com.tom.mainGui.Canton.cantonList;
+
 public class Util {
 
     public static JLabel calculateButtonLabel;
@@ -43,6 +45,8 @@ public class Util {
     static JLabel churchTaxLabel = new JLabel(churchTaxText);
     public static JLabel pensionLabel = new JLabel();
     public static JRadioButton churchTax = new JRadioButton("Church Tax?");
+
+
 
     // calculate the salary, input of pre-tax salary and pension values
     static double calcSalary(double preTaxSalary, double pensionValue, double churchTax) {
@@ -85,34 +89,13 @@ public class Util {
         JLabel enterPensionLabel = new JLabel("Enter your employee pension contribution (%):");
         JLabel cantonLabel = new JLabel("Choose your Canton of Residence:");
 
+        // Create cantonList array
+        Canton.createCantonList();
+
         // Add all the elements into the GUI panel
-        JComboBox<Canton> cantonField = new JComboBox<>();
-        cantonField.addItem(Canton.aargau);
-        cantonField.addItem(Canton.appenzellAu);
-        cantonField.addItem(Canton.appenzellIn);
-        cantonField.addItem(Canton.baselLand);
-        cantonField.addItem(Canton.baselStadt);
-        cantonField.addItem(Canton.bernen);
-        cantonField.addItem(Canton.fribourg);
-        cantonField.addItem(Canton.geneva);
-        cantonField.addItem(Canton.glarus);
-        cantonField.addItem(Canton.graubunden);
-        cantonField.addItem(Canton.jura);
-        cantonField.addItem(Canton.lucerne);
-        cantonField.addItem(Canton.neuchatel);
-        cantonField.addItem(Canton.nidwalden);
-        cantonField.addItem(Canton.obwalden);
-        cantonField.addItem(Canton.schaffhausen);
-        cantonField.addItem(Canton.schwyz);
-        cantonField.addItem(Canton.solothurn);
-        cantonField.addItem(Canton.stGallen);
-        cantonField.addItem(Canton.ticino);
-        cantonField.addItem(Canton.thurgau);
-        cantonField.addItem(Canton.uri);
-        cantonField.addItem(Canton.valais);
-        cantonField.addItem(Canton.vaud);
-        cantonField.addItem(Canton.zug);
-        cantonField.addItem(Canton.zurich);
+        for (Canton canton : cantonList) {
+            Canton.cantonField.addItem(canton);
+        }
 
         salaryField = new JTextField(1);
         pensionField = new JTextField(1);
@@ -127,7 +110,7 @@ public class Util {
         panel.add(enterPensionLabel);
         panel.add(pensionField);
         panel.add(cantonLabel);
-        panel.add(cantonField);
+        panel.add(Canton.cantonField);
         panel.add(churchTax);
         panel.add(calculateButton);
 
@@ -154,12 +137,13 @@ public class Util {
         });
 
         //called when a canton is selected in the cantonList field
-        cantonField.addActionListener(new ActionListener() {
+        Canton.cantonField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Select");
-                Canton cantonFieldSelectedItem = cantonField.getItemAt(cantonField.getSelectedIndex()); // Crates a variable of type Canton and finds Canton in the Field
-                taxRate = cantonFieldSelectedItem.getTaxRate();                                        // Update the global variable with chosen Canton's tax rate
-                taxText = "Income Tax at " + taxRate + "%: CHF" + taxValue;                           // Update the label to reflect newly set tax rate
+
+                Canton cantonFieldSelectedItem = (Canton) Canton.cantonField.getItemAt(Canton.cantonField.getSelectedIndex()); // Crates a variable of type Canton and finds Canton in the Field
+                taxRate = cantonFieldSelectedItem.getTaxRate();                                                               // Update the global variable with chosen Canton's tax rate
+                cantonFieldSelectedItem.printObject();
+                System.out.println("canton selected, tax rate set to: " + taxRate);
             }
         });
     }
@@ -201,7 +185,9 @@ public class Util {
         } else {
             System.out.println("churchTax.isSelected is false");
             panel.remove(churchTaxLabel);
+            panel.remove(mthlTaxField);
             panel.add(postTaxField);
+            panel.add(mthlTaxField);
             frame.pack();
         }
     }
@@ -231,8 +217,10 @@ public class Util {
 
     // Processes the calculations
     public static void processCalc(String pensionAmt) {
-        System.out.println("processCalc called");
+
         String pensionText = "Pension at " + pensionAmt + "%: CHF";
+
+        System.out.println("processCalc called " + taxText);
         System.out.println("Print values is true");
         System.out.println("Calculating post tax salary");
 
@@ -242,6 +230,7 @@ public class Util {
 
         // update the labels with the new values
         updateValues(postTaxSalaryAmt, mthNetSalaryAmt);
+        taxText = "Income Tax at " + taxRate + "%: CHF" + taxValue;                                                  // Update the label to reflect newly set tax rate
 
         // add the labels for the deductions after calculating
         addDeductionPanels();
@@ -251,7 +240,7 @@ public class Util {
 
     // clears values if nullChecker fails
     public static void clearAfterNull() {
-        System.out.println("clearAfterNull called");
+        System.out.println("clearAfterNull called, taxvalue" + taxValue);
         panel.remove(ahvLabel);
         panel.remove(alvLabel);
         panel.remove(taxLabel);
@@ -266,7 +255,7 @@ public class Util {
 
     // checks required values have been entered and can we proceed with printing results
     public static boolean nullChecker(String preTaxSalaryAmt, String pensionAmt) {
-        System.out.println("nullChecker called");
+        System.out.println("nullChecker called, tax value" + taxValue);
 
         boolean printValues;
         String SalaryErr = "Please enter a salary value";
